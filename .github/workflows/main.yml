@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build StoreMaster V13 APK
+    name: Build StoreMaster V14 APK
     runs-on: ubuntu-latest
 
     steps:
@@ -32,12 +32,26 @@ jobs:
           sdkmanager "platforms;android-36"
           sdkmanager "build-tools;36.0.0"
 
-      - name: Extract StoreMaster V13
+      - name: Extract StoreMaster V14
         run: |
           rm -rf project
           mkdir -p project
 
-          unzip -o "StoreMaster-ADM-Launcher-v13-Compact-Responsive-FINAL.zip" -d project
+          ZIP_FILE="StoreMaster-ADM-Launcher-v14-Medium-Responsive-FINAL.zip"
+
+          if [ ! -f "$ZIP_FILE" ]; then
+            echo "ERROR: V14 ZIP file not found:"
+            echo "$ZIP_FILE"
+            echo ""
+            echo "Files in repository:"
+            ls -lah
+            exit 1
+          fi
+
+          echo "V14 ZIP found:"
+          ls -lh "$ZIP_FILE"
+
+          unzip -o "$ZIP_FILE" -d project
 
           echo "===== PROJECT FILES ====="
           find project -maxdepth 6 -type f | sort
@@ -80,7 +94,7 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build StoreMaster V13 APK
+      - name: Build StoreMaster V14 APK
         run: |
           cd "$PROJECT_DIR"
           gradle assembleDebug --stacktrace
@@ -94,10 +108,10 @@ jobs:
             -path "*/build/outputs/apk/debug/*.apk" \
             -print
 
-      - name: Upload StoreMaster APK
+      - name: Upload StoreMaster V14 APK
         uses: actions/upload-artifact@v4
         with:
-          name: StoreMaster-ADM-APK-V13-Compact-Responsive
+          name: StoreMaster-ADM-APK-V14-Medium-Responsive
           path: |
             project/**/build/outputs/apk/debug/*.apk
           if-no-files-found: error
